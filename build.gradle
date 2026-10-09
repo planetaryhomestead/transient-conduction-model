@@ -17,6 +17,7 @@ def yamlExtension = ".yaml"
 def jsonExtension = ".json"
 def pythonExtension = ".py"
 def markdownExtension = ".md"
+def pdfExtension = ".pdf"
 def unifiedSchemaFileName = "unifiedSchema"
 def unifiedSchemaSrcDirPath = "$projectDir/packages/initial-boundary-value-problem-schema"
 def unifiedSchemaBuildPath = "$buildDir/$unifiedSchemaFileName$yamlExtension"
@@ -42,8 +43,11 @@ def resultsBuildDir = "$buildDir/$queryDirName/$resultsBuildDirName"
 def reportTemplateFileName = "analysis_report.md.njk"
 def reportTemplateDir = "$projectDir/$viewsDirName"
 def reportTemplatePath = "$reportTemplateDir/$reportTemplateFileName"
-def reportBuildDirName = "$viewsDirName/reports"
-def reportBuildDir = "$buildDir/$reportBuildDirName"
+def reportsBuildDirName = "$viewsDirName/reports"
+def reportsBuildDir = "$buildDir/$reportsBuildDirName"
+def mystBuildDir = "$reportsBuildDir"
+def webBuildDirName = "$viewsDirName/web"
+def webBuildDir = "$buildDir/$webBuildDirName"
 
 tasks.register('createPythonVenv') {
     inputs.files(fileTree("$projectDir"))
@@ -205,11 +209,11 @@ tasks.register('generateReports') {
     dependsOn(generateAnalysisResults)
     inputs.files(fileTree("$resultsBuildDir"))
         .withPathSensitivity(PathSensitivity.ABSOLUTE)
-    outputs.dir(layout.buildDirectory.dir("$reportBuildDir"))
+    outputs.dir(layout.buildDirectory.dir("$reportsBuildDir"))
     doLast {
         new File("$modelExamplesBuildDir").eachDir { exampleDir ->
             exec {
-                commandLine "bash", "-c", "npm exec -- nunjucks -d $resultsBuildDir/$exampleDir.name$jsonExtension $reportTemplatePath > $reportBuildDir/$exampleDir.name$markdownExtension && cat $reportBuildDir/$exampleDir.name$markdownExtension"
+                commandLine "bash", "-c", "npm exec -- nunjucks -d $resultsBuildDir/$exampleDir.name$jsonExtension $reportTemplatePath > $reportsBuildDir/$exampleDir.name$markdownExtension && cat $reportsBuildDir/$exampleDir.name$markdownExtension"
             }
         }
     }
@@ -217,22 +221,34 @@ tasks.register('generateReports') {
 
 tasks.register('generateMystBuild') {
     dependsOn(generateReports)
-    inputs.files(fileTree("$reportBuildDir"))
+    inputs.files(fileTree("$reportsBuildDir"))
         .withPathSensitivity(PathSensitivity.ABSOLUTE)
-    outputs.dir(file("$reportBuildDir"))
+    outputs.dir(file("$reportsBuildDir"))
 
     doLast {
-        fileTree("$reportBuildDir").matching {
-            include "*$markdownExtension"
-        }.each { reportFile ->
+        new File("$modelExamplesBuildDir").eachDir { exampleDir ->
             exec {
-                workingDir = file("$reportBuildDir")
-                commandLine "bash", "-c", "myst build --pdf ${reportFile.name}"
+                workingDir = file("$reportsBuildDir")
+                commandLine "bash", "-c", "myst build --pdf -o $mystBuildDir/$exampleDir.name$pdfExtension $exampleDir.name$markdownExtension"
+            }
+        }
+    }
+}
+
+tasks.register('copyPDFsToWebBuildDir') {
+    dependsOn(generateMystBuild)
+    inputs.files(fileTree("$reportsBuildDir"))
+        .withPathSensitivity(PathSensitivity.ABSOLUTE)
+    outputs.dir(layout.buildDirectory.dir("$webBuildDir"))
+    doLast {
+        new File("$modelExamplesBuildDir").eachDir { exampleDir ->
+            exec {
+                commandLine "bash", "-c", "cp $mystBuildDir/$exampleDir.name$pdfExtension $webBuildDir"
             }
         }
     }
 }
 
 tasks.named("assemble") {
-    dependsOn(generateMystBuild)
+    dependsOn(copyPDFsToWebBuildDir)
 }
