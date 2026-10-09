@@ -201,7 +201,7 @@ tasks.register('generateAnalysisResults') {
     }
 }
 
-tasks.register('generateReport') {
+tasks.register('generateReports') {
     dependsOn(generateAnalysisResults)
     inputs.files(fileTree("$resultsBuildDir"))
         .withPathSensitivity(PathSensitivity.ABSOLUTE)
@@ -215,7 +215,24 @@ tasks.register('generateReport') {
     }
 }
 
-tasks.named("assemble") {
-    dependsOn(generateReport)
+tasks.register('generateMystBuild') {
+    dependsOn(generateReports)
+    inputs.files(fileTree("$reportBuildDir"))
+        .withPathSensitivity(PathSensitivity.ABSOLUTE)
+    outputs.dir(file("$reportBuildDir"))
+
+    doLast {
+        fileTree("$reportBuildDir").matching {
+            include "*$markdownExtension"
+        }.each { reportFile ->
+            exec {
+                workingDir = file("$reportBuildDir")
+                commandLine "bash", "-c", "myst build --pdf ${reportFile.name}"
+            }
+        }
+    }
 }
 
+tasks.named("assemble") {
+    dependsOn(generateMystBuild)
+}
