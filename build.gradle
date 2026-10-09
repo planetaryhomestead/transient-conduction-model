@@ -94,9 +94,11 @@ tasks.register('loadModelExamples') {
     .withPathSensitivity(PathSensitivity.ABSOLUTE)
     outputs.dir(layout.buildDirectory.dir("$modelExamplesBuildDir"))
     doLast {
-        new File("$modelExamplesSrcDir").eachDir { dir ->
-            exec {
-                commandLine "bash", "-c", "npm exec -- yds-load $modelExamplesSrcDir/$dir.name > $modelExamplesBuildDir/$dir.name$yamlExtension"
+        new File("$modelExamplesSrcDir").eachDir { methodDir ->
+            new File("$methodDir").eachDir { exampleDir -> 
+                exec {
+                    commandLine "bash", "-c", "mkdir $modelExamplesBuildDir/$exampleDir.name && npm exec -- yds-load $methodDir/$exampleDir.name > $modelExamplesBuildDir/$exampleDir.name/_this.yaml"
+                }
             }
         }
     }
@@ -107,12 +109,9 @@ tasks.register('validateModelExamples') {
     inputs.files(fileTree("$modelExamplesBuildDir"))
     .withPathSensitivity(PathSensitivity.ABSOLUTE)
     doLast {
-        fileTree("$modelExamplesBuildDir").matching {
-            include "*$yamlExtension"
-        }.each { file ->
+        new File("$modelExamplesBuildDir").eachDir { exampleDir ->
             exec {
-                //commandLine "echo", "$unifiedSchemaBuildPath"
-                commandLine "linkml-validate", "-s", "$unifiedSchemaBuildPath", "--target-class", "InitialBoundaryValueProblem", "$modelExamplesBuildDir/$file.name"
+                commandLine "linkml-validate", "-s", "$unifiedSchemaBuildPath", "--target-class", "InitialBoundaryValueProblem", "$exampleDir/_this.yaml"
             }
         }
     }
@@ -124,9 +123,9 @@ tasks.register('buildImportsMerger') {
         .withPathSensitivity(PathSensitivity.ABSOLUTE)
     outputs.dir(layout.buildDirectory.dir("$mergedImportsModelBuildDir"))
     doLast {
-        new File("$modelExamplesSrcDir").eachDir { dir ->
+        new File("$modelExamplesBuildDir").eachDir { exampleDir ->
             exec {
-                commandLine "bash", "-c", "npm exec -- nunjucks -d $modelExamplesBuildDir/$dir.name$yamlExtension $querySrcDir/$importsMergerTemplateFileName > $mergedImportsModelBuildDir/$dir.name$pythonExtension"
+                commandLine "bash", "-c", "npm exec -- nunjucks -d $exampleDir/_this.yaml $querySrcDir/$importsMergerTemplateFileName > $mergedImportsModelBuildDir/$exampleDir.name$pythonExtension"
             }
         }
     }
@@ -138,9 +137,9 @@ tasks.register('buildModelExamplesWithMergedImports') {
         .withPathSensitivity(PathSensitivity.ABSOLUTE)
     outputs.dir(layout.buildDirectory.dir("$mergedImportsModelBuildDir"))
     doLast {
-        new File("$modelExamplesSrcDir").eachDir { dir ->
+        new File("$modelExamplesBuildDir").eachDir { exampleDir ->
             exec {
-                commandLine "bash", "-c", "./venv/bin/python $mergedImportsModelBuildDir/$dir.name$pythonExtension > $mergedImportsModelBuildDir/$dir.name$yamlExtension"
+                commandLine "bash", "-c", "./venv/bin/python $mergedImportsModelBuildDir/$exampleDir.name$pythonExtension > $mergedImportsModelBuildDir/$exampleDir.name$yamlExtension"
             }
         }
     }
@@ -152,9 +151,9 @@ tasks.register('buildEquationsSolver') {
         .withPathSensitivity(PathSensitivity.ABSOLUTE)
     outputs.dir(layout.buildDirectory.dir("$solvedEquationsModelBuildDir"))
     doLast {
-        new File("$modelExamplesSrcDir").eachDir { dir ->
+        new File("$modelExamplesBuildDir").eachDir { exampleDir ->
             exec {
-                commandLine "bash", "-c", "npm exec -- nunjucks -d $mergedImportsModelBuildDir/$dir.name$yamlExtension $querySrcDir/$solveForEquationsTemplateFileName > $solvedEquationsModelBuildDir/$dir.name$pythonExtension"
+                commandLine "bash", "-c", "npm exec -- nunjucks -d $mergedImportsModelBuildDir/$exampleDir.name$yamlExtension $querySrcDir/$solveForEquationsTemplateFileName > $solvedEquationsModelBuildDir/$exampleDir.name$pythonExtension"
             }
         }
     }
@@ -166,9 +165,9 @@ tasks.register('buildModelExamplesWithSolvedEquations') {
         .withPathSensitivity(PathSensitivity.ABSOLUTE)
     outputs.dir(layout.buildDirectory.dir("$solvedEquationsModelBuildDir"))
     doLast {
-        new File("$modelExamplesSrcDir").eachDir { dir ->
+        new File("$modelExamplesBuildDir").eachDir { exampleDir ->
             exec {
-                commandLine "bash", "-c", "./venv/bin/python $solvedEquationsModelBuildDir/$dir.name$pythonExtension > $solvedEquationsModelBuildDir/$dir.name$yamlExtension"
+                commandLine "bash", "-c", "./venv/bin/python $solvedEquationsModelBuildDir/$exampleDir.name$pythonExtension > $solvedEquationsModelBuildDir/$exampleDir.name$yamlExtension"
             }
         }
     }
@@ -180,9 +179,9 @@ tasks.register('buildAnalyticalModelExamples') {
         .withPathSensitivity(PathSensitivity.ABSOLUTE)
     outputs.dir(layout.buildDirectory.dir("$resultsBuildDir"))
     doLast {
-        new File("$modelExamplesSrcDir").eachDir { dir ->
+        new File("$modelExamplesBuildDir").eachDir { exampleDir ->
             exec {
-                commandLine "bash", "-c", "npm exec -- nunjucks -d $solvedEquationsModelBuildDir/$dir.name$yamlExtension $querySrcDir/$analyticalModelTemplateFileName > $analyticalModelBuildDir/$dir.name$pythonExtension"
+                commandLine "bash", "-c", "npm exec -- nunjucks -d $solvedEquationsModelBuildDir/$exampleDir.name$yamlExtension $querySrcDir/$analyticalModelTemplateFileName > $analyticalModelBuildDir/$exampleDir.name$pythonExtension"
             }
         }
     }
@@ -194,9 +193,9 @@ tasks.register('generateAnalysisResults') {
         .withPathSensitivity(PathSensitivity.ABSOLUTE)
     outputs.dir(layout.buildDirectory.dir("$resultsBuildDir"))
     doLast {
-        new File("$modelExamplesSrcDir").eachDir { dir ->
+        new File("$modelExamplesBuildDir").eachDir { exampleDir ->
             exec {
-                commandLine "bash", "-c", "./venv/bin/python $analyticalModelBuildDir/$dir.name$pythonExtension > $resultsBuildDir/$dir.name$jsonExtension"
+                commandLine "bash", "-c", "./venv/bin/python $analyticalModelBuildDir/$exampleDir.name$pythonExtension > $resultsBuildDir/$exampleDir.name$jsonExtension"
             }
         }
     }
@@ -208,11 +207,9 @@ tasks.register('generateReport') {
         .withPathSensitivity(PathSensitivity.ABSOLUTE)
     outputs.dir(layout.buildDirectory.dir("$reportBuildDir"))
     doLast {
-        fileTree("$resultsBuildDir").matching {
-            include "*$jsonExtension"
-        }.each { file ->
+        new File("$modelExamplesBuildDir").eachDir { exampleDir ->
             exec {
-                commandLine "bash", "-c", "npm exec -- nunjucks -d $file $reportTemplatePath > $reportBuildDir/$file.name$markdownExtension && cat $reportBuildDir/$file.name$markdownExtension"
+                commandLine "bash", "-c", "npm exec -- nunjucks -d $resultsBuildDir/$exampleDir.name$jsonExtension $reportTemplatePath > $reportBuildDir/$exampleDir.name$markdownExtension && cat $reportBuildDir/$exampleDir.name$markdownExtension"
             }
         }
     }

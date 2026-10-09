@@ -1,3 +1,3 @@
-thermocoupleMeasurementOfGasStreamUsingLumpedCapacitanceMethod: ((thermocoupleMeasurementOfGasStreamUsingLumpedCapacitanceMethod/_this.yaml))
-planeWallWithConvectionUsingOneTermApproximation: ((planeWallWithConvectionUsingOneTermApproximation/_this.yaml))
-soilWithConstantSurfaceTemperatureModeledAsSemiInfiniteSolid: ((soilWithConstantSurfaceTemperatureModeledAsSemiInfiniteSolid/_this.yaml))
+lumped_capacitance_method: ((lumped_capacitance_method/_this.yaml))
+one_term_approximation: ((one_term_approximation/_this.yaml))
+semi_infinite_solid: ((semi_infinite_solid/_this.yaml))
