@@ -1,1 +1,1 @@
-import: transient-conduction-model:model.equations.oneTermApproximation.c1List
+import: transient-conduction-model:model.equations.one_term_approximation.c1_list

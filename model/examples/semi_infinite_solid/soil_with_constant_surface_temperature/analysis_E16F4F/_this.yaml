@@ -1,2 +1,2 @@
-import: transient-conduction-model:model.equations.semiInfiniteSolid.temperatureDistributionForConstantSurfaceTemperature
+import: transient-conduction-model:model.equations.semi_infinite_solid.temperature_distribution_for_constant_surface_temperature
 solveFor: ((solveFor/_this.yaml))

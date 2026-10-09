@@ -1,1 +1,1 @@
-import: transient-conduction-model:model.equations.oneTermApproximation.fourierNumber
+import: transient-conduction-model:model.equations.one_term_approximation.fourier_number

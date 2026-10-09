@@ -1,1 +1,1 @@
-import: transient-conduction-model:model.equations.oneTermApproximation.theta
+import: transient-conduction-model:model.equations.one_term_approximation.theta

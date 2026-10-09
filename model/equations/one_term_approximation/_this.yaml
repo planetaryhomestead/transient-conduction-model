@@ -1,0 +1,8 @@
+fourier_number: ((fourier_number/_this.yaml))
+bi_list: ((bi_list/_this.yaml))
+zeta1_list: ((zeta1_list/_this.yaml))
+c1_list: ((c1_list/_this.yaml))
+zeta1: ((zeta1/_this.yaml))
+c1: ((c1/_this.yaml))
+theta0: ((theta0/_this.yaml))
+theta: ((theta/_this.yaml))

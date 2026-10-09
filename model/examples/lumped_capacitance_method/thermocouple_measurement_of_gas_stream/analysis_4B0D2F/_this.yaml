@@ -1,1 +1,1 @@
-import: transient-conduction-model:model.equations.lumpedCapacitanceMethod.biotNumber
+import: transient-conduction-model:model.equations.lumped_capacitance_method.biot_number
