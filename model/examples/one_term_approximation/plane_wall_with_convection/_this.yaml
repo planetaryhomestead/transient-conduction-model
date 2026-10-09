@@ -2,7 +2,7 @@ description: Plane Wall with Convection using One-Term Approximation
 parameters: ((parameters.yaml))
 constants: ((constants.yaml))
 analysis: ((analysis.yaml))
-problemStatement_txt: ((problemStatement.txt))
+problem_statement_txt: ((problem_statement.txt))
 schematic_txt: ((schematic.txt))
 assumptions: ((assumptions.yaml))
 comments: ((comments.yaml))

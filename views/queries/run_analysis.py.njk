@@ -59,7 +59,7 @@ schematic_txt = f"""{{ schematic_txt }}"""
 
 analysis_results = {
 "description": description,
-"problemStatement_txt": "",
+"problem_statement_txt": "",
 "assumptions": assumptions,
 "schematic_txt": schematic_txt,
 "results": [],
@@ -95,8 +95,8 @@ computation_list_item["computation"] = computation
 analysis_results["results"].append(computation_list_item)
 {% endfor %}
 
-problemStatement_txt = f"""{{ problemStatement_txt }}"""
-analysis_results["problemStatement_txt"] = problemStatement_txt
+problem_statement_txt = f"""{{ problem_statement_txt }}"""
+analysis_results["problem_statement_txt"] = problem_statement_txt
 
 print(json.dumps(analysis_results, indent=2))
 
